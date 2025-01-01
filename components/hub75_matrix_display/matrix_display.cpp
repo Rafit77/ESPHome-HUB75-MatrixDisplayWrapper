@@ -101,6 +101,9 @@ namespace esphome
             }
 
             // Log i2speed
+            // don't know why "duplicate" case, disable for now
+            ESP_LOGCONFIG(TAG, "clk_speed: %i", dma_display_->getCfg().i2sspeed);
+            /*
             switch (dma_display_->getCfg().i2sspeed)
             {
                 case HUB75_I2S_CFG::clk_speed::HZ_8M:
@@ -119,6 +122,7 @@ namespace esphome
                     ESP_LOGCONFIG(TAG, "I2SSpeed: HZ_20M");
                     break;
             }
+            */
 
             ESP_LOGCONFIG(TAG, "Latch blanking: %i", dma_display_->getCfg().latch_blanking);
 
