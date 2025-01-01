@@ -6,7 +6,7 @@ esphome:
       - Wire
       - Adafruit BusIO
       - adafruit/Adafruit GFX Library
-      - https://github.com/Rafit77/ESP32-HUB75-MatrixPanel-DMA#main
+      - https://github.com/Rafit77/ESP32-HUB75-MatrixPanel-DMA#master
 
 display:
   - platform: hub75_matrix_display
