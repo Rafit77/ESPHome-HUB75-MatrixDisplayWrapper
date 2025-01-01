@@ -1,5 +1,7 @@
 #pragma once
 
+using namespace esphome;
+
 #include <utility>
 
 #include "esphome/core/hal.h"
