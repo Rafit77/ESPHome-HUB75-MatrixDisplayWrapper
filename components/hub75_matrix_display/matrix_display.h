@@ -1,13 +1,13 @@
 #pragma once
 
-using namespace esphome;
-
 #include <utility>
 
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
+
+using namespace esphome;
 
 #include "ESP32-HUB75-MatrixPanel-I2S-DMA.h"
 
