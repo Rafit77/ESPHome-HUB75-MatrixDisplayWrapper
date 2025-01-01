@@ -1,6 +1,6 @@
 #include "matrix_display.h"
 
-namespace esphome
+//namespace esphome  // moved to .h
 {
     namespace matrix_display
     {
