@@ -77,28 +77,28 @@ namespace esphome
             // Log driver settings
             switch (dma_display_->getCfg().driver)
             {
-            case HUB75_I2S_CFG::shift_driver::SHIFTREG:
-                ESP_LOGCONFIG(TAG, "Driver: SHIFTREG");
-                break;
-            case HUB75_I2S_CFG::shift_driver::FM6124:
-                ESP_LOGCONFIG(TAG, "Driver: FM6124");
-                break;
-            case HUB75_I2S_CFG::shift_driver::FM6126A:
-                ESP_LOGCONFIG(TAG, "Driver: FM6126A");
-                break;
-            case HUB75_I2S_CFG::shift_driver::ICN2038S:
-                ESP_LOGCONFIG(TAG, "Driver: ICN2038S");
-                break;
-            case HUB75_I2S_CFG::shift_driver::MBI5124:
-                ESP_LOGCONFIG(TAG, "Driver: MBI5124");
-                break;
-            case HUB75_I2S_CFG::shift_driver::SM5266P:
-                ESP_LOGCONFIG(TAG, "Driver: SM5266P");
-                break;
+                case HUB75_I2S_CFG::shift_driver::SHIFTREG:
+                    ESP_LOGCONFIG(TAG, "Driver: SHIFTREG");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::FM6124:
+                    ESP_LOGCONFIG(TAG, "Driver: FM6124");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::FM6126A:
+                    ESP_LOGCONFIG(TAG, "Driver: FM6126A");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::ICN2038S:
+                    ESP_LOGCONFIG(TAG, "Driver: ICN2038S");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::MBI5124:
+                    ESP_LOGCONFIG(TAG, "Driver: MBI5124");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::SM5266P:
+                    ESP_LOGCONFIG(TAG, "Driver: SM5266P");
+                    break;
+                case HUB75_I2S_CFG::shift_driver::DP3246_SM5368:
+                    ESP_LOGCONFIG(TAG, "Driver: DP3246_SM5368");
+                    break;
             }
-            case HUB75_I2S_CFG::shift_driver::DP3246_SM5368:
-                ESP_LOGCONFIG(TAG, "Driver: DP3246_SM5368");
-                break;
 
             // Log i2speed
             switch (dma_display_->getCfg().i2sspeed)
