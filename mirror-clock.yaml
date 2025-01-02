@@ -1,0 +1,237 @@
+substitutions:
+  ha_temp_sensor: "sensor.28_f8c32b060000_temperature"
+
+esphome:
+  name: homeclock2
+  friendly_name: HomeClock2
+  # dimm display by default after reset
+  #on_boot:
+    priority: -100
+    then:
+      - number.set:
+          id: led_brightness
+          value: 50
+
+esp32:
+  board: lolin32 #esp32dev
+  framework:
+    type: arduino
+          
+external_components:
+  - source: github://Rafit77/ESPHome-HUB75-MatrixDisplayWrapper@main
+    refresh: 0h
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "xxxxxxxxxxxxxxxxx"
+
+ota:
+  - platform: esphome
+    password: "xxxxxxxxxxxxxxxxxxx"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+globals:
+  - id: months_pl
+    type:  std::array<std::string, 13>
+    initial_value: '{"","Stycznia","Lutego","Marca","Kwietnia","Maja","Czerwca","Lipca","Sierpnia","Września","Października","Listopada","Grudnia"}'
+    restore_value: no
+  - id: days_of_week_pl
+    type:  std::array<std::string, 8>
+    initial_value: '{"","Niedziela","Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota"}'
+    restore_value: no
+    
+  - id: clock_color
+    type: Color
+    initial_value: 'Color(255,0,0)'
+    restore_value: no
+  - id: weekend_color
+    type: Color
+    initial_value: 'Color(255,100,0)'
+    restore_value: no
+  - id: calendar_color
+    type: Color
+    initial_value: 'Color(0,130,0)'
+    restore_value: no
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Warsaw
+    servers:
+      - 0.pool.ntp.org
+      - 1.pool.ntp.org
+      - 2.pool.ntp.org
+
+font:
+  - file: "gfonts://Ubuntu"
+    id: temperature_font
+    size: 10
+
+  - file:
+      type: gfonts
+      family: Ubuntu
+    id: small_font
+    glyphsets: GF_Latin_Core
+    size: 10
+    #size: 9
+
+  - file:
+      type: gfonts
+      family: Roboto Flex  
+      #weight: bold
+    id: big_digits
+    glyphs: [ "0","1","2","3","4","5","6","7","8","9",":"," ","."]
+    size: 22
+
+status_led:
+  pin:
+    number: 5
+    inverted: yes
+
+
+sensor:
+  - platform: homeassistant
+    entity_id: "${ha_temp_sensor}"
+    id: OutsideTemperature
+
+  # local light sensor, but not working for me
+  - platform: adc
+    pin: A0
+    name: "LUX Sensor"
+    update_interval: '1s'
+    id: lux
+    raw: true
+    unit_of_measurement: lux
+    accuracy_decimals: 0
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 5
+    # not working for me, but maybe usefull for someone
+#    on_value_range:
+#      # night, no lights
+#      - below: 1
+#        then:
+#            - number.set:
+#                id: led_brightness
+#                value: 50
+#      # noc, with some lights
+#      - above: 2
+#        below: 20
+#        then:
+#            - number.set:
+#                id: led_brightness
+#                value: 100
+#      # day
+#      - above: 21
+#        then:
+#            - number.set:
+#                id: led_brightness
+#                value: 200
+
+# need to set them in homeasistant (like check calendar every 5 min)
+text_sensor:
+  - platform: homeassistant
+    name: "CLOCK bathroom text 1"
+    entity_id: input_text.clock_b_text_1
+    id: clock_text1
+  
+  - platform: homeassistant
+    name: "CLOCK bathroom text 2"
+    entity_id: input_text.clock_b_text_2
+    id: clock_text2
+
+  - platform: homeassistant
+    name: "CLOCK bathroom text 3"
+    entity_id: input_text.clock_b_text_3
+    id: clock_text3
+
+display:
+  - platform: hub75_matrix_display
+    id: matrix
+    width: 128
+    height: 64
+    R1_pin: 25
+    G1_pin: 26
+    B1_pin: 27
+    R2_pin: 14
+    G2_pin: 12
+    B2_pin: 13
+    A_pin: 23
+    B_pin: 18
+    C_pin: 19
+    LAT_pin: 4
+    OE_pin: 15
+    CLK_pin: 16
+    driver: DP3246_SM5368   #SHIFTREG, FM6124, FM6126A, ICN2038S, MBI5124, SM5266, DP3246_SM5368
+    i2sspeed: HZ_15M
+#    latch_blanking: 4
+#    clock_phase: false
+#    update_interval: 8 ms
+    lambda: |-
+      if (id(sntp_time).now().is_valid()) {
+        if (id(sntp_time).now().second %2 == 0) {
+          it.strftime(32,  9, id(big_digits),id(clock_color), TextAlign::CENTER, "%H:%M", id(sntp_time).now());   // time HH:MM
+        } else {
+          it.strftime(32,  9, id(big_digits),id(clock_color), TextAlign::CENTER, "%H.%M", id(sntp_time).now());   // time HH:MM
+        }
+
+        // date: day. month
+        it.printf(64+32, 4, id(small_font),id(clock_color), TextAlign::CENTER, "%d.%s", id(sntp_time).now().day_of_month, id(months_pl)[id(sntp_time).now().month].c_str()); // date dd month
+
+        // day of the week
+        if (id(sntp_time).now().day_of_week == 1 || id(sntp_time).now().day_of_week == 7) {
+            // weekend !
+            it.printf(64+32, 13, id(small_font),id(weekend_color) , TextAlign::CENTER,id(days_of_week_pl)[id(sntp_time).now().day_of_week].c_str());
+        } else {
+            it.printf(64+32, 13, id(small_font),id(clock_color) , TextAlign::CENTER,id(days_of_week_pl)[id(sntp_time).now().day_of_week].c_str());
+        }
+      } else {
+        it.print(0, 0, id(small_font),id(clock_color) , "No time recieved");
+      }
+
+      // place for calendar events
+      it.printf(0, 18, id(small_font),id(calendar_color)  , TextAlign::LEFT,id(clock_text1).state.c_str());
+      it.printf(0, 30, id(small_font),id(calendar_color)  , TextAlign::LEFT,id(clock_text2).state.c_str());
+      it.printf(0, 42, id(small_font),id(calendar_color)  , TextAlign::LEFT,id(clock_text3).state.c_str());
+      //it.printf(0, 43, id(small_font),id(calendar_color)  , TextAlign::LEFT,id(clock_text4).state.c_str());
+
+      // temperature
+      if (id(OutsideTemperature).has_state()) { 
+        it.printf(  40, 53, id(temperature_font),id(clock_color), TextAlign::RIGHT, "%3.1f°C", id(OutsideTemperature).state);
+      }
+
+#switch:
+#  - platform: hub75_matrix_display
+#    matrix_id: matrix
+#    name: "Power"
+#    restore_mode: ALWAYS_ON
+#    id: power
+
+number:
+  - platform: hub75_matrix_display
+    matrix_id: matrix
+    name: "Brightness"
+    id: led_brightness
+    icon: mdi:brightness-6
+    # dim colors below 10 (because dimming has no effect below 10)
+    on_value:
+      then:
+        - globals.set:
+            id: clock_color
+            value: !lambda 'return Color(min(255, 28 * int(id(led_brightness)) ) ,0                                       ,0);'
+        - globals.set:
+            id: weekend_color
+            value: !lambda 'return Color(min(255, 28 * int(id(led_brightness)) ) , min(100, 11 * int(id(led_brightness)) ),0);'
+        - globals.set:
+            id: calendar_color
+            value: !lambda 'return Color(0,                                        min(130, 14 * int(id(led_brightness)) ),0);'
+
+
