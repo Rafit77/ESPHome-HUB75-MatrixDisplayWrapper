@@ -3,7 +3,7 @@
 - added driver: DP3246_SM5368 (A,B,C pins as register)
 - added extra bus speed (8,10,14,15,20)
 - all this because of the newer [ESP32-HUB75-MatrixPanel-DMA] version used as a base (a small fix was required /bus frequency/, that's why I use a clone instead of the original repo)
-- I will add my clock configuration as an extra example
+- I will add my clock configuration as an extra example [clock example](mirror-clock.yaml)
 
 # ESP32-HUB75-MatrixPanel-I2S-DMA ESPHome wrapper [![CI](https://github.com/TillFleisch/ESPHome-HUB75-MatrixDisplayWrapper/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/TillFleisch/ESPHome-HUB75-MatrixDisplayWrapper/actions/workflows/ci.yaml)
 
@@ -17,6 +17,10 @@ This wrapper currently only supports horizontally chained panels.
 
 - 128x64 Pixel P2 Panel,
 - configured as "clock" + calendar event + outside temperature
+- hidden behind One-way mirror
+![Mirror Clock](images/mirror-clock.png)
+
+**WARNING**... for reference, the mirror is a good WiFi blocker (I forgot...)
 
 # Configuration variables
 
